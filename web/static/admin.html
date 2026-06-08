@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevFolio Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#0a0a0f; --surface:#111118; --border:#1e1e2e; --accent:#7c6ff7; --text:#e2e8f0; --muted:#64748b; --warn:#f87171; --ok:#4ade80; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh}
+    /* Login */
+    #login-view{display:none;min-height:100vh;align-items:center;justify-content:center}
+    #login-view.active{display:flex}
+    .login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px;width:100%;max-width:380px}
+    .login-box h1{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:4px}
+    .login-box p{font-size:.78rem;color:var(--muted);margin-bottom:28px}
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .field input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.85rem;outline:none;transition:border-color .15s}
+    .field input:focus{border-color:var(--accent)}
+    .btn{padding:10px 18px;border-radius:6px;font-family:inherit;font-size:.8rem;cursor:pointer;border:none;transition:.15s}
+    .btn-primary{background:var(--accent);color:#fff;font-weight:500}
+    .btn-primary:hover{background:#6a5ee0}
+    .btn-danger{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+    .btn-danger:hover{background:var(--warn);color:#fff}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+    .err{color:var(--warn);font-size:.78rem;margin-bottom:12px;display:none}
+    /* Dashboard */
+    #dashboard-view{display:none}
+    #dashboard-view.active{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    aside{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column}
+    .aside-logo{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--accent);margin-bottom:32px;padding:0 8px}
+    .nav-item{display:block;padding:9px 12px;border-radius:6px;font-size:.8rem;color:var(--muted);cursor:pointer;transition:.15s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+    .nav-item:hover,.nav-item.active{background:rgba(124,111,247,.1);color:var(--text)}
+    .aside-spacer{flex:1}
+    main{padding:32px;overflow-y:auto}
+    .main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+    .main-header h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+    .tab{display:none}
+    .tab.active{display:block}
+    /* Tables */
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;padding:10px 16px;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+    td{padding:12px 16px;font-size:.82rem;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    .td-actions{display:flex;gap:8px}
+    /* Forms */
+    .form-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;margin-bottom:24px}
+    .form-box h3{font-size:.85rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .form-group input,.form-group textarea,.form-group select{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:.82rem;outline:none;transition:border-color .15s;resize:vertical}
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--accent)}
+    /* Badges */
+    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem}
+    .badge-read{background:rgba(74,222,128,.1);color:var(--ok);border:1px solid rgba(74,222,128,.2)}
+    .badge-unread{background:rgba(248,113,113,.1);color:var(--warn);border:1px solid rgba(248,113,113,.2)}
+    /* Toast */
+    #toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 18px;font-size:.8rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999}
+    #toast.show{opacity:1}
+    #toast.ok{border-color:var(--ok);color:var(--ok)}
+    #toast.err{border-color:var(--warn);color:var(--warn)}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-view" class="active">
+  <div class="login-box">
+    <h1>Admin Panel</h1>
+    <p>Manage your portfolio content</p>
+    <div class="err" id="login-err"></div>
+    <div class="field"><label>Email</label><input type="email" id="l-email" placeholder="admin@example.com" /></div>
+    <div class="field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()" /></div>
+    <button class="btn btn-primary" style="width:100%;padding:12px" onclick="adminLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-view">
+  <aside>
+    <div class="aside-logo">⬡ DevFolio</div>
+    <button class="nav-item active" onclick="showTab('projects')">📁 Projects</button>
+    <button class="nav-item" onclick="showTab('skills')">⚡ Skills</button>
+    <button class="nav-item" onclick="showTab('experience')">🏢 Experience</button>
+    <button class="nav-item" onclick="showTab('messages')">📬 Messages</button>
+    <div class="aside-spacer"></div>
+    <button class="nav-item" onclick="logout()" style="color:var(--warn)">→ Logout</button>
+  </aside>
+
+  <main>
+    <!-- PROJECTS TAB -->
+    <div class="tab active" id="tab-projects">
+      <div class="main-header">
+        <h2>Projects</h2>
+        <button class="btn btn-primary" onclick="openProjectForm()">+ Add Project</button>
+      </div>
+      <div class="form-box" id="project-form" style="display:none">
+        <h3 id="pf-title">New Project</h3>
+        <input type="hidden" id="pf-id" />
+        <div class="form-row">
+          <div class="form-group"><label>Title</label><input id="pf-name" placeholder="LinkLens" /></div>
+          <div class="form-group"><label>Tags (comma-separated)</label><input id="pf-tags" placeholder="Go,Gin,Redis" /></div>
+        </div>
+        <div class="form-group"><label>Short Description</label><input id="pf-desc" placeholder="A URL shortener with analytics..." /></div>
+        <div class="form-group"><label>Long Description</label><textarea id="pf-long" rows="3"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>GitHub URL</label><input id="pf-github" placeholder="https://github.com/..." /></div>
+          <div class="form-group"><label>Live URL</label><input id="pf-live" placeholder="https://..." /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Image URL</label><input id="pf-img" placeholder="https://..." /></div>
+          <div class="form-group"><label>Sort Order</label><input type="number" id="pf-sort" value="0" /></div>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="pf-featured" style="width:auto" />
+          <label for="pf-featured" style="font-size:.82rem;color:var(--text)">Featured project</label>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button class="btn btn-primary" onclick="saveProject()">Save</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('project-form').style.display='none'">Cancel</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Title</th><th>Tags</th><th>Featured</th><th>Actions</th></tr></thead>
+        <tbody id="projects-table"></tbody>
+      </table></div>
+    </div>
+
+    <!-- SKILLS TAB -->
+    <div class="tab" id="tab-skills">
+      <div class="main-header">
+        <h2>Skills</h2>
+        <button class="btn btn-primary" onclick="openSkillForm()">+ Add Skill</button>
+      </div>
+      <div class="form-box" id="skill-form" style="display:none">
+        <h3>Skill</h3>
+        <input type="hidden" id="sf-id" />
+        <div class="form-row">
+          <div class="form-group"><label>Name</label><input id="sf-name" placeholder="Go" /></div>
+          <div class="form-group"><label>Category</label><input id="sf-cat" placeholder="Backend" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Proficiency (1–100)</label><input type="number" id="sf-prof" min="1" max="100" value="80" /></div>
+          <div class="form-group"><label>Sort Order</label><input type="number" id="sf-sort" value="0" /></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button class="btn btn-primary" onclick="saveSkill()">Save</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('skill-form').style.display='none'">Cancel</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Category</th><th>Proficiency</th><th>Actions</th></tr></thead>
+        <tbody id="skills-table"></tbody>
+      </table></div>
+    </div>
+
+    <!-- EXPERIENCE TAB -->
+    <div class="tab" id="tab-experience">
+      <div class="main-header">
+        <h2>Experience</h2>
+        <button class="btn btn-primary" onclick="openExpForm()">+ Add</button>
+      </div>
+      <div class="form-box" id="exp-form" style="display:none">
+        <h3>Experience</h3>
+        <input type="hidden" id="ef-id" />
+        <div class="form-row">
+          <div class="form-group"><label>Company</label><input id="ef-company" /></div>
+          <div class="form-group"><label>Role</label><input id="ef-role" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Start Date</label><input id="ef-start" placeholder="Jan 2023" /></div>
+          <div class="form-group"><label>End Date (blank = Present)</label><input id="ef-end" placeholder="Dec 2024" /></div>
+        </div>
+        <div class="form-group"><label>Description</label><textarea id="ef-desc" rows="3"></textarea></div>
+        <div class="form-group"><label>Company URL</label><input id="ef-url" placeholder="https://..." /></div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button class="btn btn-primary" onclick="saveExp()">Save</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('exp-form').style.display='none'">Cancel</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Role</th><th>Company</th><th>Period</th><th>Actions</th></tr></thead>
+        <tbody id="exp-table"></tbody>
+      </table></div>
+    </div>
+
+    <!-- MESSAGES TAB -->
+    <div class="tab" id="tab-messages">
+      <div class="main-header"><h2>Messages</h2></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="messages-table"></tbody>
+      </table></div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = '';
+let token = localStorage.getItem('df_admin_token') || '';
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (token) { showDashboard(); loadAll(); }
+  else { showLoginView(); }
+});
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+async function adminLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('login-err');
+  err.style.display = 'none';
+  try {
+    const res = await api('/api/admin/login', 'POST', {email, password: pass});
+    token = res.token;
+    localStorage.setItem('df_admin_token', token);
+    showDashboard(); loadAll();
+  } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
+}
+function logout() { token = ''; localStorage.removeItem('df_admin_token'); showLoginView(); }
+function showLoginView() { document.getElementById('login-view').classList.add('active'); document.getElementById('dashboard-view').classList.remove('active'); }
+function showDashboard() { document.getElementById('login-view').classList.remove('active'); document.getElementById('dashboard-view').classList.add('active'); }
+
+// ── Navigation ──────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'messages') loadMessages();
+}
+
+async function loadAll() { await Promise.all([loadProjects(), loadSkills(), loadExperience()]); }
+
+// ── Projects ────────────────────────────────────────────────────────────────
+async function loadProjects() {
+  const res = await api('/api/projects'); const projects = res.projects || [];
+  document.getElementById('projects-table').innerHTML = projects.map(p => `
+    <tr>
+      <td>${esc(p.title)}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${(p.tags||[]).join(', ')}</td>
+      <td>${p.featured ? '★' : '—'}</td>
+      <td class="td-actions">
+        <button class="btn btn-ghost" style="font-size:.75rem" onclick='editProject(${JSON.stringify(p)})'>Edit</button>
+        <button class="btn btn-danger" style="font-size:.75rem" onclick="deleteProject('${p.id}')">Del</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No projects yet</td></tr>';
+}
+function openProjectForm(p) {
+  const f = document.getElementById('project-form'); f.style.display = 'block';
+  document.getElementById('pf-id').value      = p?.id || '';
+  document.getElementById('pf-title').textContent = p ? 'Edit Project' : 'New Project';
+  document.getElementById('pf-name').value    = p?.title || '';
+  document.getElementById('pf-desc').value    = p?.description || '';
+  document.getElementById('pf-long').value    = p?.long_description || '';
+  document.getElementById('pf-tags').value    = (p?.tags||[]).join(', ');
+  document.getElementById('pf-github').value  = p?.github_url || '';
+  document.getElementById('pf-live').value    = p?.live_url || '';
+  document.getElementById('pf-img').value     = p?.image_url || '';
+  document.getElementById('pf-sort').value    = p?.sort_order || 0;
+  document.getElementById('pf-featured').checked = !!p?.featured;
+  f.scrollIntoView({behavior:'smooth'});
+}
+function editProject(p) { openProjectForm(p); }
+async function saveProject() {
+  const id = document.getElementById('pf-id').value || 'new';
+  const body = {
+    title: document.getElementById('pf-name').value, description: document.getElementById('pf-desc').value,
+    long_description: document.getElementById('pf-long').value,
+    tags: document.getElementById('pf-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    github_url: document.getElementById('pf-github').value, live_url: document.getElementById('pf-live').value,
+    image_url: document.getElementById('pf-img').value,
+    sort_order: parseInt(document.getElementById('pf-sort').value)||0,
+    featured: document.getElementById('pf-featured').checked,
+  };
+  try { await api('/api/admin/projects/' + id, 'POST', body); toast('Project saved ✓', 'ok'); document.getElementById('project-form').style.display='none'; loadProjects(); }
+  catch(e) { toast(e.message, 'err'); }
+}
+async function deleteProject(id) {
+  if (!confirm('Delete this project?')) return;
+  try { await api('/api/admin/projects/' + id, 'DELETE'); toast('Deleted', 'ok'); loadProjects(); }
+  catch(e) { toast(e.message, 'err'); }
+}
+
+// ── Skills ───────────────────────────────────────────────────────────────────
+async function loadSkills() {
+  const res = await api('/api/skills'); const skills = res.skills || [];
+  document.getElementById('skills-table').innerHTML = skills.map(s => `
+    <tr>
+      <td>${esc(s.name)}</td><td style="color:var(--muted)">${esc(s.category)}</td>
+      <td style="color:var(--accent)">${s.proficiency}%</td>
+      <td class="td-actions">
+        <button class="btn btn-ghost" style="font-size:.75rem" onclick='editSkill(${JSON.stringify(s)})'>Edit</button>
+        <button class="btn btn-danger" style="font-size:.75rem" onclick="deleteSkill('${s.id}')">Del</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No skills yet</td></tr>';
+}
+function openSkillForm(s) {
+  const f = document.getElementById('skill-form'); f.style.display = 'block';
+  document.getElementById('sf-id').value   = s?.id || '';
+  document.getElementById('sf-name').value = s?.name || '';
+  document.getElementById('sf-cat').value  = s?.category || '';
+  document.getElementById('sf-prof').value = s?.proficiency || 80;
+  document.getElementById('sf-sort').value = s?.sort_order || 0;
+}
+function editSkill(s) { openSkillForm(s); }
+async function saveSkill() {
+  const id = document.getElementById('sf-id').value || 'new';
+  const body = { name: document.getElementById('sf-name').value, category: document.getElementById('sf-cat').value,
+    proficiency: parseInt(document.getElementById('sf-prof').value)||80, sort_order: parseInt(document.getElementById('sf-sort').value)||0 };
+  try { await api('/api/admin/skills/' + id, 'POST', body); toast('Skill saved ✓','ok'); document.getElementById('skill-form').style.display='none'; loadSkills(); }
+  catch(e) { toast(e.message,'err'); }
+}
+async function deleteSkill(id) {
+  if (!confirm('Delete?')) return;
+  try { await api('/api/admin/skills/'+id,'DELETE'); toast('Deleted','ok'); loadSkills(); } catch(e) { toast(e.message,'err'); }
+}
+
+// ── Experience ───────────────────────────────────────────────────────────────
+async function loadExperience() {
+  const res = await api('/api/experience'); const exps = res.experience || [];
+  document.getElementById('exp-table').innerHTML = exps.map(e => `
+    <tr>
+      <td>${esc(e.role)}</td><td style="color:var(--muted)">${esc(e.company)}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${esc(e.start_date)} – ${esc(e.end_date||'Present')}</td>
+      <td class="td-actions">
+        <button class="btn btn-ghost" style="font-size:.75rem" onclick='editExp(${JSON.stringify(e)})'>Edit</button>
+        <button class="btn btn-danger" style="font-size:.75rem" onclick="deleteExp('${e.id}')">Del</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No experience yet</td></tr>';
+}
+function openExpForm(e) {
+  const f = document.getElementById('exp-form'); f.style.display='block';
+  document.getElementById('ef-id').value      = e?.id||'';
+  document.getElementById('ef-company').value = e?.company||'';
+  document.getElementById('ef-role').value    = e?.role||'';
+  document.getElementById('ef-start').value   = e?.start_date||'';
+  document.getElementById('ef-end').value     = e?.end_date||'';
+  document.getElementById('ef-desc').value    = e?.description||'';
+  document.getElementById('ef-url').value     = e?.company_url||'';
+}
+function editExp(e) { openExpForm(e); }
+async function saveExp() {
+  const id = document.getElementById('ef-id').value||'new';
+  const body = { company: document.getElementById('ef-company').value, role: document.getElementById('ef-role').value,
+    start_date: document.getElementById('ef-start').value, end_date: document.getElementById('ef-end').value,
+    description: document.getElementById('ef-desc').value, company_url: document.getElementById('ef-url').value,
+    is_current: !document.getElementById('ef-end').value };
+  try { await api('/api/admin/experience/'+id,'POST',body); toast('Saved ✓','ok'); document.getElementById('exp-form').style.display='none'; loadExperience(); }
+  catch(e) { toast(e.message,'err'); }
+}
+async function deleteExp(id) {
+  if(!confirm('Delete?'))return;
+  try { await api('/api/admin/experience/'+id,'DELETE'); toast('Deleted','ok'); loadExperience(); } catch(e) { toast(e.message,'err'); }
+}
+
+// ── Messages ─────────────────────────────────────────────────────────────────
+async function loadMessages() {
+  const res = await api('/api/admin/messages'); const msgs = res.messages || [];
+  document.getElementById('messages-table').innerHTML = msgs.map(m => `
+    <tr>
+      <td>${esc(m.name)}</td>
+      <td style="color:var(--muted)">${esc(m.email)}</td>
+      <td>${esc(m.subject)}</td>
+      <td style="font-size:.75rem;color:var(--muted)">${new Date(m.created_at).toLocaleDateString()}</td>
+      <td><span class="badge ${m.is_read?'badge-read':'badge-unread'}">${m.is_read?'read':'new'}</span></td>
+      <td>${m.is_read ? '' : `<button class="btn btn-ghost" style="font-size:.75rem" onclick="markRead('${m.id}')">Mark read</button>`}</td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No messages yet</td></tr>';
+}
+async function markRead(id) {
+  try { await api('/api/admin/messages/'+id+'/read','PATCH'); loadMessages(); } catch(e) { toast(e.message,'err'); }
+}
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function api(path, method='GET', body) {
+  const opts = { method, headers:{'Content-Type':'application/json'} };
+  if (token) opts.headers['Authorization'] = 'Bearer '+token;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API+path, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error||'Request failed');
+  return data;
+}
+function esc(s){ if(!s)return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let _tt;
+function toast(msg, type='') {
+  const el=document.getElementById('toast'); el.textContent=msg; el.className='show '+(type||'');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.className='',2600);
+}
+</script>
+</body>
+</html>
