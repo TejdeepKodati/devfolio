@@ -18,9 +18,9 @@ func Load() *Config {
 		Port:        getEnv("PORT", "8070"),
 		DatabaseURL: getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/devfolio?sslmode=disable"),
 		RedisURL:    getEnv("REDIS_URL", "redis://localhost:6379"),
-		JWTSecret:   getEnv("JWT_SECRET", "devfolio-change-in-production"),
-		AdminEmail:  getEnv("ADMIN_EMAIL", "admin@tejdeep.dev"),
-		AdminPass:   getEnv("ADMIN_PASS", "changeme123"),
+		JWTSecret:   getEnv("JWT_SECRET", ""),  // Cleaned: No hardcoded fallbacks
+		AdminEmail:  getEnv("ADMIN_EMAIL", ""), // Cleaned: No hardcoded fallbacks
+		AdminPass:   getEnv("ADMIN_PASS", ""),  // Cleaned: No hardcoded fallbacks
 	}
 }
 

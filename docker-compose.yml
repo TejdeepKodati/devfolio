@@ -6,13 +6,13 @@ services:
     ports:
       - "8070:8070"
     environment:
-      ENV: development
-      PORT: 8070
-      DATABASE_URL: postgres://postgres:postgres@db:5432/devfolio?sslmode=disable
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: devfolio-change-in-production-min-32-chars
-      ADMIN_EMAIL: admin@tejdeep.dev
-      ADMIN_PASS: changeme123
+      ENV: ${ENV:-development}
+      PORT: ${PORT:-8070}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASS: ${ADMIN_PASS}
     depends_on:
       db:
         condition: service_healthy

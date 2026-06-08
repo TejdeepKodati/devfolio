@@ -79,8 +79,8 @@ INSERT INTO projects (title, description, long_description, tags, github_url, li
   'A production-grade URL shortener with per-link analytics, Redis caching, and JWT authentication.',
   'Built with Go, Gin, PostgreSQL, and Redis. Features click tracking (device, browser, country), custom short codes, link expiry, and a minimal analytics dashboard.',
   '["Go","Gin","PostgreSQL","Redis","JWT"]',
-  'https://github.com/tejdeep/linklens',
-  '',
+  'https://github.com/TejdeepKodati/linklens',
+  'http://107.22.34.102:8080/',
   TRUE, 1
 ),
 (
@@ -88,7 +88,7 @@ INSERT INTO projects (title, description, long_description, tags, github_url, li
   'A distributed webhook delivery engine with goroutine worker pool, exponential backoff retries, and HMAC signing.',
   'Backend-only service solving reliable event delivery. Uses Redis queues + sorted sets for delayed retries, dead-letter queue for permanently failed deliveries, and HMAC-SHA256 for endpoint signature verification.',
   '["Go","Gin","Redis","PostgreSQL","Distributed Systems","Webhooks"]',
-  'https://github.com/tejdeep/gorelay',
+  'https://github.com/TejdeepKodati/gorelay',
   '',
   TRUE, 2
 )
@@ -107,9 +107,9 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO experiences (company, role, description, start_date, end_date, is_current, sort_order) VALUES
 (
-  'Your Company',
-  'Backend Engineer',
-  'Building scalable REST APIs with Go and Gin. Designed Redis caching layers and PostgreSQL schemas for high-throughput systems.',
+  'Independent Open-Source Development',
+  'Backend & DevOps Engineer',
+  'Building scalable REST APIs with Go and Gin. Designing Redis caching layers and PostgreSQL schemas for high-throughput systems.',
   'Jan 2024', '', TRUE, 1
 )
 ON CONFLICT DO NOTHING;
