@@ -74,11 +74,7 @@ cp .env.example .env
 docker compose up --build
 # App:   http://localhost:8070
 # Admin: http://localhost:8070/admin
-```
-
-Default admin credentials (from .env.example):
-- Email: `admin@tejdeep.dev`
-- Password: `changeme123`
+````
 
 ### Manual
 ```bash
